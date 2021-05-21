@@ -19,10 +19,13 @@ using namespace cv;
 
 class Filter {
     private:
-
+        int filter;
+        int border;
     
     public:
         Filter();
+        void setFilter();
+        void setBorder();
 };
 
 class Noise {
