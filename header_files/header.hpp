@@ -21,11 +21,16 @@ class Filter {
     private:
         int filter;
         int border;
+        int kernelSize;
+        int sigma;
     
     public:
         Filter();
-        void setFilter();
-        void setBorder();
+        cv::Mat applyFilter(cv::Mat);
+        void setFilter(int);
+        void setBorder(int);
+        void setSigma(int);
+        void setkernelSize(int);
 };
 
 class Noise {

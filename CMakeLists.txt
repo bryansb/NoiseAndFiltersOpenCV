@@ -15,6 +15,7 @@ include_directories( ${OpenCV_INCLUDE_DIRS} )
 set( project_sources
    "source_files/main.cpp"
    "source_files/noise.cpp"
+   "source_files/filter.cpp"
 )
 
 # Create executable with all necessary source files
