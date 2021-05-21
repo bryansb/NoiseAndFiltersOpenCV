@@ -19,12 +19,10 @@ Noise saltNoise;
 
 void pepperNoiseTrackbar(int v, void *data){
     pepperFrame = pepperNoise.generateNoise(grayFrame, pepperPorcentage);
-    //cout << pepperPorcentage << endl;
 }
 
 void saltNoiseTrackbar(int v, void *data){
     saltFrame = saltNoise.generateNoise(grayFrame, saltPorcentage);
-    //cout << pepperPorcentage << endl;
 }
 
 int main(int, char**) {
@@ -40,9 +38,8 @@ int main(int, char**) {
         namedWindow("Video con Ruido", WINDOW_AUTOSIZE);
         //namedWindow("Video con Filtros", WINDOW_AUTOSIZE);
         
-        //
-        createTrackbar("Pepper", "Video Original", &pepperPorcentage, MAX_NOISE, pepperNoiseTrackbar, NULL);
-        createTrackbar("Salt", "Video Original", &saltPorcentage, MAX_NOISE, saltNoiseTrackbar, NULL);
+        createTrackbar("Pepper %", "Video con Ruido", &pepperPorcentage, MAX_NOISE, pepperNoiseTrackbar, NULL);
+        createTrackbar("Salt %", "Video con Ruido", &saltPorcentage, MAX_NOISE, saltNoiseTrackbar, NULL);
 
         while(3==3){
             video >> frame;
@@ -55,10 +52,10 @@ int main(int, char**) {
                pepperFrame = pepperNoise.generateNoise(grayFrame, pepperPorcentage);
                saltFrame = saltNoise.generateNoise(grayFrame, saltPorcentage);
 
-               //bitwise_and(pepperFrame, saltFrame, noisyFrame);
-               noisyFrame = pepperFrame + saltFrame;
+               //noisyFrame = cv::abs(pepperFrame + saltFrame);
+               //cv::add(pepperFrame, saltFrame, noisyFrame);
+               cv::addWeighted(pepperFrame, 0.5, saltFrame, 0.5, 0, noisyFrame);
             }
-
             
 
             imshow("Video Original", grayFrame);

@@ -7,8 +7,6 @@ cv::Mat Noise::generateNoise(cv::Mat frame, double percentage = 25){
     cv::Mat noisyFrame = frame.clone();
     percentage = percentage / 100;
 
-    //cout << "Pepper: " << percentage << endl;
-
     double frameRows = frame.rows;
     double frameCols = frame.cols;
 
