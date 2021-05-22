@@ -4,6 +4,7 @@ cv::Mat frame;
 cv::Mat grayFrame;
 cv::Mat noisyFrame;
 cv::Mat filteredFrame;
+cv::Mat edgeFrame;
 
 cv::Mat pepperFrame;
 cv::Mat saltFrame;
@@ -13,11 +14,15 @@ int saltPorcentage = 0;
 int MAX_NOISE = 100;
 
 int filterNumber = 0;
-int kernelSize = 1; 
-int sigma = 1;
-int MAX_SIGMA = 70;
-int MAX_KERNEL = 255;
-int MAX_FILTER = 2;
+int edgeNumber = 0;
+int thres = 40;
+int kernelSizeF = 3;
+int kernelSizeE = 3; 
+int MAX_KERNEL_SIZE = 17;
+int MAX_KERNEL_SIZE_EDGE = 7;
+int MAX_THRES_VALUE = 150;
+int MAX_FILTER_NUMBER = 3;
+int MAX_EDGE_NUMBER = 2;
 
 Noise pepperNoise;
 Noise saltNoise;
@@ -31,19 +36,24 @@ void saltNoiseTrackbar(int v, void *data){
     saltFrame = saltNoise.generateNoise(grayFrame, saltPorcentage);
 }
 
-void changeKernelSize(int v, void *data){
-    // saltFrame = saltNoise.generateNoise(grayFrame, saltPorcentage);
-    filter.setkernelSize(kernelSize);
+void changeKernelFilterSize(int v, void *data){
+    filter.setkernelSizeFilter(kernelSizeF);
 }
 
-void changeSigma(int v, void *data){
-    // saltFrame = saltNoise.generateNoise(grayFrame, saltPorcentage);
-    filter.setSigma(sigma);
+void changeKernelEdgeSize(int v, void *data){
+    filter.setkernelSizeEdge(kernelSizeE);
 }
 
 void changeFilter(int v, void *data){
-    // saltFrame = saltNoise.generateNoise(grayFrame, saltPorcentage);
     filter.setFilter(filterNumber);
+}
+
+void changeEdgeDetector(int v, void *data){
+    filter.setEdgeDetector(edgeNumber);
+}
+
+void changeThreshold(int v, void *data){
+    filter.setThreshold(thres);
 }
 
 void deleteVariables(){
@@ -51,17 +61,16 @@ void deleteVariables(){
     delete &grayFrame;
     delete &noisyFrame;
     delete &filteredFrame;
+    delete &edgeFrame;
     delete &pepperFrame;
     delete &saltFrame;
     delete &pepperPorcentage;
     delete &saltPorcentage;
     delete &MAX_NOISE;
     delete &filterNumber;
-    delete &kernelSize; 
-    delete &sigma;
-    delete &MAX_SIGMA;
-    delete &MAX_KERNEL;
-    delete &MAX_FILTER;
+    delete &kernelSizeF; 
+    delete &MAX_KERNEL_SIZE;
+    delete &MAX_FILTER_NUMBER;
     delete &pepperNoise;
     delete &saltNoise;
     delete &filter;
@@ -81,6 +90,7 @@ int main(int, char**) {
         namedWindow("Video Original", WINDOW_AUTOSIZE);
         namedWindow("Video con Ruido", WINDOW_AUTOSIZE);
         namedWindow("Video con Filtros", WINDOW_AUTOSIZE);
+        namedWindow("Video con Bordes", WINDOW_AUTOSIZE);
         
         // ----- Trackbars
         // --- Para el ruido
@@ -88,9 +98,16 @@ int main(int, char**) {
         createTrackbar("Salt %", "Video con Ruido", &saltPorcentage, MAX_NOISE, saltNoiseTrackbar, NULL);
         
         // --- Para el filtrado
-        createTrackbar("Filter", "Video con Filtros", &filterNumber, MAX_FILTER, changeFilter, NULL);
-        createTrackbar("Kernel", "Video con Filtros", &kernelSize, MAX_KERNEL, changeKernelSize, NULL);
-        createTrackbar("Sigma", "Video con Filtros", &sigma, MAX_SIGMA, changeSigma, NULL);
+        createTrackbar("Filter", "Video con Filtros", &filterNumber, MAX_FILTER_NUMBER, changeFilter, NULL);
+        createTrackbar("Kernel", "Video con Filtros", &kernelSizeF, MAX_KERNEL_SIZE, changeKernelFilterSize, NULL);
+
+        // --- Para la detección de bordes
+        createTrackbar("Edge-D", "Video con Bordes", &edgeNumber, MAX_EDGE_NUMBER, changeEdgeDetector, NULL);
+        createTrackbar("Kernel", "Video con Bordes", &kernelSizeE, MAX_KERNEL_SIZE_EDGE, changeKernelEdgeSize, NULL);
+        createTrackbar("Thres (C)", "Video con Bordes", &thres, MAX_THRES_VALUE, changeThreshold, NULL);
+
+        filter.setkernelSizeEdge(3);
+        filter.setkernelSizeFilter(3);
 
         while(3==3){
             video >> frame;
@@ -101,24 +118,25 @@ int main(int, char**) {
             if(noisyFrame.empty()){
                 noisyFrame = grayFrame.clone();
             } else {
-               pepperFrame = pepperNoise.generateNoise(grayFrame, pepperPorcentage);
-               saltFrame = saltNoise.generateNoise(grayFrame, saltPorcentage);
-
-               //noisyFrame = cv::abs(pepperFrame + saltFrame);
-               //cv::add(pepperFrame, saltFrame, noisyFrame);
-               cv::addWeighted(pepperFrame, 0.5, saltFrame, 0.5, 0, noisyFrame);
+                pepperFrame = pepperNoise.generateNoise(grayFrame, pepperPorcentage);
+                saltFrame = saltNoise.generateNoise(grayFrame, saltPorcentage);
+                cv::addWeighted(pepperFrame, 0.5, saltFrame, 0.5, 0, noisyFrame);
             }
             
+            // --- Aplicación de Filtros
             if(filteredFrame.empty()){
                 filteredFrame = noisyFrame.clone();
+                edgeFrame = filter.applyEdgeDetector(filteredFrame);
             } else {
-               filteredFrame = filter.applyFilter(noisyFrame);
+                filteredFrame = filter.applyFilter(noisyFrame);
+                edgeFrame = filter.applyEdgeDetector(filteredFrame);
             }
 
             // --- Mostrar videos
             imshow("Video Original", grayFrame);
             imshow("Video con Ruido", noisyFrame);
             imshow("Video con Filtros", filteredFrame);
+            imshow("Video con Bordes", edgeFrame);
 
             //setMouseCallback("Video Nuevo", onMouseCallback, NULL);
             if(waitKey(23) == 27){

@@ -19,18 +19,21 @@ using namespace cv;
 
 class Filter {
     private:
+        int edge;
         int filter;
-        int border;
-        int kernelSize;
-        int sigma;
+        int kernelSizeEdge;
+        int kernelSizeFilter;
+        int threshold;
     
     public:
         Filter();
         cv::Mat applyFilter(cv::Mat);
+        cv::Mat applyEdgeDetector(cv::Mat);
         void setFilter(int);
-        void setBorder(int);
-        void setSigma(int);
-        void setkernelSize(int);
+        void setThreshold(int);
+        void setkernelSizeFilter(int);
+        void setkernelSizeEdge(int);
+        void setEdgeDetector(int);
 };
 
 class Noise {
