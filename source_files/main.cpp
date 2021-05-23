@@ -18,7 +18,7 @@ int edgeNumber = 0;
 int thres = 40;
 int kernelSizeF = 3;
 int kernelSizeE = 3; 
-int MAX_KERNEL_SIZE = 17;
+int MAX_KERNEL_SIZE = 21;
 int MAX_KERNEL_SIZE_EDGE = 7;
 int MAX_THRES_VALUE = 150;
 int MAX_FILTER_NUMBER = 3;
@@ -137,8 +137,7 @@ int main(int, char**) {
             imshow("Video con Ruido", noisyFrame);
             imshow("Video con Filtros", filteredFrame);
             imshow("Video con Bordes", edgeFrame);
-
-            //setMouseCallback("Video Nuevo", onMouseCallback, NULL);
+            
             if(waitKey(23) == 27){
                 break;
             }

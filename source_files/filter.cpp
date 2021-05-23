@@ -7,7 +7,7 @@ cv::Mat Filter::applyFilter(cv::Mat frame){
     cv::Mat filteredFrame = frame.clone();
 
     int kernel = this->kernelSizeFilter;
-    double sigmaRT = ((double) kernel - 1.0) / 6.0;
+    double sigma = 0.3 * (((double) kernel - 1) * 0.5 - 1) + 0.8;
 
     if(kernel%2!=0 && kernel>0){
 
@@ -21,8 +21,7 @@ cv::Mat Filter::applyFilter(cv::Mat frame){
             break;
 
         case 2:
-            cout << sigmaRT << endl;
-            GaussianBlur(frame, filteredFrame, Size(kernel, kernel), sigmaRT, sigmaRT);
+            GaussianBlur(frame, filteredFrame, Size(kernel, kernel), sigma, sigma);
             break;
 
         case 3:
